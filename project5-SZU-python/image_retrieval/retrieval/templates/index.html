@@ -1,0 +1,567 @@
+{% extends 'base.html' %}
+
+{% block title %}ViT Image Retrieval System{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Hero Section */
+    .hero {
+        text-align: center;
+        padding: 48px 0;
+    }
+
+    .hero-title {
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+        background: var(--bg-secondary);
+        border: 2px dashed var(--border-color);
+        border-radius: 16px;
+        padding: 48px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 32px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .upload-zone:hover {
+        border-color: var(--accent-blue);
+        background: rgba(88, 166, 255, 0.03);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .upload-zone.dragover {
+        border-color: var(--accent-blue);
+        background: rgba(88, 166, 255, 0.08);
+        transform: scale(1.01);
+    }
+
+    .upload-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        opacity: 0.6;
+    }
+
+    .upload-zone:hover .upload-icon {
+        opacity: 1;
+    }
+
+    .upload-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .upload-hint {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .upload-btn-inline {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 32px;
+        background: var(--accent-blue);
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .upload-zone:hover .upload-btn-inline {
+        background: var(--accent-blue-dark);
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+
+    /* Preview Section */
+    .preview-section {
+        display: none;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 32px 0;
+    }
+
+    .preview-section.active {
+        display: block;
+    }
+
+    .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .preview-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .preview-image {
+        max-width: 300px;
+        max-height: 300px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        margin: 0 auto;
+        display: block;
+    }
+
+    /* Loading */
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(13, 17, 23, 0.85);
+        backdrop-filter: blur(4px);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loading-overlay.active {
+        display: flex;
+    }
+
+    .loading-content {
+        text-align: center;
+    }
+
+    .loading-spinner {
+        width: 56px;
+        height: 56px;
+        border: 3px solid var(--border-color);
+        border-top-color: var(--accent-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        font-size: 16px;
+        color: var(--text-secondary);
+    }
+
+    .loading-subtext {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+
+    /* Results Section */
+    .results-section {
+        margin: 40px 0;
+    }
+
+    .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+
+    .results-title {
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .results-badge {
+        background: var(--accent-green);
+        color: white;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .result-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .result-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent-blue);
+        box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+
+    .result-card-rank {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(13, 17, 23, 0.8);
+        backdrop-filter: blur(4px);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+    }
+
+    .result-card-image {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .result-card-info {
+        padding: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .result-card-similarity {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .similarity-label {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .similarity-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--accent-green);
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .similarity-bar {
+        height: 4px;
+        background: var(--bg-tertiary);
+        border-radius: 2px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .similarity-bar-fill {
+        height: 100%;
+        background: var(--accent-gradient);
+        border-radius: 2px;
+        transition: width 0.5s ease;
+    }
+
+    /* History Section */
+    .history-section {
+        margin-top: 48px;
+        padding-top: 32px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .history-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 16px;
+    }
+
+    .history-item {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+    .history-item:hover {
+        border-color: var(--text-muted);
+    }
+
+    .history-item-image {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+
+    .history-item-info {
+        padding: 10px;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        opacity: 0.3;
+        margin-bottom: 20px;
+    }
+
+    /* Tech Badge */
+    .tech-badges {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+
+    .tech-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .tech-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+    .tech-badge-dot.python { background: #3572A5; }
+    .tech-badge-dot.numpy { background: #4dabcf; }
+    .tech-badge-dot.vit { background: var(--accent-purple); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1 class="hero-title">ViT Image Retrieval</h1>
+    <p class="hero-subtitle">Vision Transformer based image similarity search powered by DINOv2 and pure NumPy implementation</p>
+    <div class="tech-badges">
+        <span class="tech-badge"><span class="tech-badge-dot python"></span>Python</span>
+        <span class="tech-badge"><span class="tech-badge-dot numpy"></span>NumPy</span>
+        <span class="tech-badge"><span class="tech-badge-dot vit"></span>DINOv2-ViT</span>
+    </div>
+</div>
+
+<div class="upload-zone" id="uploadZone">
+    <input type="file" id="imageInput" accept="image/*" style="display:none">
+    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+    <div class="upload-title">Drop your image here</div>
+    <div class="upload-hint">or click to browse from your computer</div>
+    <div class="upload-btn-inline">Select Image</div>
+</div>
+
+<div class="preview-section" id="previewSection">
+    <div class="preview-header">
+        <span class="preview-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            Query Image
+        </span>
+        <button class="btn btn-secondary" onclick="clearPreview()">Clear</button>
+    </div>
+    <img id="preview" class="preview-image" alt="Preview">
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Searching for similar images...</div>
+        <div class="loading-subtext">Extracting features with Vision Transformer</div>
+    </div>
+</div>
+
+<div class="results-section" id="resultsSection" style="display:none;">
+    <div class="results-header">
+        <h2 class="results-title">
+            Search Results
+            <span class="results-badge" id="resultCount">0 matches</span>
+        </h2>
+    </div>
+    <div class="results-grid" id="resultsGrid"></div>
+</div>
+
+{% if history %}
+<div class="history-section">
+    <h3 class="history-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+        </svg>
+        Recent Searches
+    </h3>
+    <div class="history-grid">
+        {% for record in history %}
+        <div class="history-item">
+            <img class="history-item-image" src="/media/{{ record.query_image }}" alt="Query">
+            <div class="history-item-info">{{ record.created_at|date:"M d, H:i" }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const uploadZone = document.getElementById('uploadZone');
+const imageInput = document.getElementById('imageInput');
+const previewSection = document.getElementById('previewSection');
+const preview = document.getElementById('preview');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const resultsSection = document.getElementById('resultsSection');
+const resultsGrid = document.getElementById('resultsGrid');
+const resultCount = document.getElementById('resultCount');
+
+// Click to upload
+uploadZone.addEventListener('click', () => imageInput.click());
+
+// Drag and drop
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('dragover');
+});
+
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        handleFile(file);
+    }
+});
+
+// File input change
+imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) handleFile(file);
+});
+
+function handleFile(file) {
+    // Show preview
+    preview.src = URL.createObjectURL(file);
+    previewSection.classList.add('active');
+
+    // Show loading
+    loadingOverlay.classList.add('active');
+    resultsSection.style.display = 'none';
+
+    // Upload and search
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch('/search/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        loadingOverlay.classList.remove('active');
+
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+
+        displayResults(data.results);
+    })
+    .catch(err => {
+        loadingOverlay.classList.remove('active');
+        alert('Error: ' + err);
+    });
+}
+
+function displayResults(results) {
+    resultsSection.style.display = 'block';
+    resultCount.textContent = results.length + ' matches';
+
+    resultsGrid.innerHTML = '';
+    results.forEach((item, i) => {
+        const filename = item.path.split(/[/\\]/).pop();
+        const similarity = (item.similarity * 100).toFixed(2);
+
+        resultsGrid.innerHTML += `
+            <div class="result-card">
+                <span class="result-card-rank">#${i + 1}</span>
+                <img class="result-card-image" src="/static/gallery/${filename}" alt="Result ${i + 1}">
+                <div class="result-card-info">
+                    <div class="result-card-similarity">
+                        <span class="similarity-label">Similarity</span>
+                        <span class="similarity-value">${similarity}%</span>
+                    </div>
+                    <div class="similarity-bar">
+                        <div class="similarity-bar-fill" style="width: ${similarity}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function clearPreview() {
+    previewSection.classList.remove('active');
+    preview.src = '';
+    imageInput.value = '';
+    resultsSection.style.display = 'none';
+}
+</script>
+{% endblock %}

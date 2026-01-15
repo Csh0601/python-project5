@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - ViT Retrieval{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .auth-container {
+        max-width: 420px;
+        margin: 60px auto;
+    }
+
+    .auth-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .auth-logo {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+    }
+
+    .auth-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .auth-form .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .auth-form .form-input {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 14px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+    }
+
+    .auth-form .form-input:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    }
+
+    .auth-submit {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 500;
+        background: var(--accent-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+    }
+
+    .auth-submit:hover {
+        background: var(--accent-blue-dark);
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .auth-footer-text {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .auth-footer-link {
+        color: var(--accent-blue);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer-link:hover {
+        text-decoration: underline;
+    }
+
+    .form-errors {
+        background: rgba(248, 81, 73, 0.1);
+        border: 1px solid rgba(248, 81, 73, 0.3);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+    }
+
+    .form-errors ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-errors li {
+        font-size: 13px;
+        color: #f85149;
+        padding: 4px 0;
+    }
+
+    .field-errors {
+        margin-top: 6px;
+    }
+
+    .field-errors li {
+        font-size: 12px;
+        color: #f85149;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <svg class="auth-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="64" height="64" rx="16" fill="url(#authGradient)"/>
+                <path d="M16 24L32 16L48 24V40L32 48L16 40V24Z" stroke="white" stroke-width="3" fill="none"/>
+                <circle cx="32" cy="32" r="6" fill="white"/>
+                <defs>
+                    <linearGradient id="authGradient" x1="0" y1="0" x2="64" y2="64">
+                        <stop stop-color="#58a6ff"/>
+                        <stop offset="1" stop-color="#a371f7"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to your account to continue</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="form-errors">
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form class="auth-form" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" class="form-input" placeholder="Enter your username" required autofocus>
+                {% if form.username.errors %}
+                <ul class="field-errors">
+                    {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password">Password</label>
+                <input type="password" name="password" id="id_password" class="form-input" placeholder="Enter your password" required>
+                {% if form.password.errors %}
+                <ul class="field-errors">
+                    {% for error in form.password.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="auth-submit">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+            <p class="auth-footer-text">
+                Don't have an account? <a href="{% url 'register' %}" class="auth-footer-link">Create one</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - ViT Retrieval{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .auth-container {
+        max-width: 420px;
+        margin: 60px auto;
+    }
+
+    .auth-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .auth-logo {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+    }
+
+    .auth-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .auth-form .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .auth-form .form-input {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 14px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+    }
+
+    .auth-form .form-input:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    }
+
+    .form-help {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 6px;
+        line-height: 1.5;
+    }
+
+    .auth-submit {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 500;
+        background: var(--accent-blue);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+    }
+
+    .auth-submit:hover {
+        background: var(--accent-blue-dark);
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .auth-footer-text {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .auth-footer-link {
+        color: var(--accent-blue);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer-link:hover {
+        text-decoration: underline;
+    }
+
+    .form-errors {
+        background: rgba(248, 81, 73, 0.1);
+        border: 1px solid rgba(248, 81, 73, 0.3);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+    }
+
+    .form-errors ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-errors li {
+        font-size: 13px;
+        color: #f85149;
+        padding: 4px 0;
+    }
+
+    .field-errors {
+        margin-top: 6px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .field-errors li {
+        font-size: 12px;
+        color: #f85149;
+        padding: 2px 0;
+    }
+
+    .password-requirements {
+        background: var(--bg-tertiary);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 16px;
+    }
+
+    .password-requirements-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .password-requirements ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .password-requirements li {
+        font-size: 12px;
+        color: var(--text-muted);
+        padding: 2px 0;
+        padding-left: 16px;
+        position: relative;
+    }
+
+    .password-requirements li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--accent-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <svg class="auth-logo" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="64" height="64" rx="16" fill="url(#authGradient)"/>
+                <path d="M16 24L32 16L48 24V40L32 48L16 40V24Z" stroke="white" stroke-width="3" fill="none"/>
+                <circle cx="32" cy="32" r="6" fill="white"/>
+                <defs>
+                    <linearGradient id="authGradient" x1="0" y1="0" x2="64" y2="64">
+                        <stop stop-color="#58a6ff"/>
+                        <stop offset="1" stop-color="#a371f7"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join us to start searching images</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="form-errors">
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form class="auth-form" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username</label>
+                <input type="text" name="username" id="id_username" class="form-input"
+                       placeholder="Choose a username" required autofocus
+                       value="{{ form.username.value|default:'' }}">
+                {% if form.username.errors %}
+                <ul class="field-errors">
+                    {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password1">Password</label>
+                <input type="password" name="password1" id="id_password1" class="form-input"
+                       placeholder="Create a password" required>
+                {% if form.password1.errors %}
+                <ul class="field-errors">
+                    {% for error in form.password1.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password2">Confirm Password</label>
+                <input type="password" name="password2" id="id_password2" class="form-input"
+                       placeholder="Confirm your password" required>
+                {% if form.password2.errors %}
+                <ul class="field-errors">
+                    {% for error in form.password2.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div class="password-requirements">
+                <div class="password-requirements-title">Password Requirements</div>
+                <ul>
+                    <li>At least 8 characters long</li>
+                    <li>Not entirely numeric</li>
+                    <li>Not too similar to your username</li>
+                </ul>
+            </div>
+
+            <button type="submit" class="auth-submit">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            <p class="auth-footer-text">
+                Already have an account? <a href="{% url 'login' %}" class="auth-footer-link">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

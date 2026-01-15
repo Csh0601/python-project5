@@ -1,0 +1,47 @@
+# 排除大文件和下载目录
+downloaded_images/
+coco_dataset/
+coco/
+
+# 排除日志和进度文件
+download.log
+download_progress.json
+failed_downloads.txt
+
+# 排除大型CSV数据文件
+data.csv
+
+# 排除大型权重文件（超过100MB GitHub限制）
+*.npz
+*.npy
+
+# 排除Claude配置
+.claude/
+CLAUDE.md
+
+# 排除Python缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 排除macOS系统文件
+__MACOSX/
+.DS_Store
+
+# 排除数据库文件
+*.sqlite3
+db.sqlite3
+
+# 排除静态图片目录（太大）
+project5-SZU-python/image_retrieval/static/gallery/
+project5-SZU-python/image_retrieval/media/
+
+# 排除features目录（包含大文件）
+project5-SZU-python/image_retrieval/features/
+
+# 排除PDF文件
+*.pdf
+
+# 排除临时文件
+nul
