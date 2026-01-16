@@ -29,31 +29,31 @@
 
 用户登录后可以看到图片上传区域和最近的搜索历史记录。
 
-![主页面](../pic%20for%20referrence/175315ec13165fdbad2cb48a889304c7.png)
+![主页面](screenshots/175315ec13165fdbad2cb48a889304c7.png)
 
 ### 用户注册页面
 
 支持用户名、密码创建，密码需满足安全要求（至少8字符、非纯数字、不与用户名相似）。
 
-![用户注册](../pic%20for%20referrence/ad77e94ce853ebe9afc35f3c9760e06e.png)
+![用户注册](screenshots/ad77e94ce853ebe9afc35f3c9760e06e.png)
 
 ### 搜索加载中
 
 上传图片后，系统使用ViT提取特征并进行相似度计算。
 
-![搜索中](../pic%20for%20referrence/1ef177dd85fc66a60d3cb34896f2ed46.png)
+![搜索中](screenshots/1ef177dd85fc66a60d3cb34896f2ed46.png)
 
 ### 图片选择
 
 支持从本地文件系统选择图片上传。
 
-![选择图片](../pic%20for%20referrence/706c3c8acd23e0b7918502715f09005f.png)
+![选择图片](screenshots/706c3c8acd23e0b7918502715f09005f.png)
 
 ### Top-10 检索结果
 
 系统从14,000+张Gallery图片中返回相似度最高的10张图片，每张显示相似度分数。
 
-![检索结果](../pic%20for%20referrence/5f6d9133d8717caba54bdb6b8ed37223.png)
+![检索结果](screenshots/5f6d9133d8717caba54bdb6b8ed37223.png)
 
 ---
 
@@ -89,8 +89,7 @@ project5-SZU-python/
 │           ├── login.html
 │           └── register.html
 │
-├── report.md                      # 详细项目报告
-└── README.md                      # 本文件
+└── report.md                      # 详细项目报告
 ```
 
 ⭐ 标注为本人重点实现的核心文件
